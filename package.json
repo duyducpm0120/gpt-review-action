@@ -1,6 +1,6 @@
 {
   "name": "gpt-review-action",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "repository": "git@github.com:duyducpm0120/gpt-review-action.git",
   "author": "Duy Đức <ducduypm0120@gmail.com>",
