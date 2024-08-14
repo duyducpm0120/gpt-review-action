@@ -1,0 +1,27 @@
+name: GPT-4 Code Review
+description: An action to review code diffs using GPT-4 or other GPT models.
+inputs:
+  diff-file-path:
+    description: "Path to the diff file"
+    required: true
+  openai-api-key:
+    description: "OpenAI API key"
+    required: true
+  github-token:
+    description: "GitHub Token"
+    required: true
+  max-parts:
+    description: "Maximum number of parts to process in one batch"
+    required: false
+    default: "5"
+  prompt:
+    description: "Custom prompt to use for the GPT-4 review"
+    required: true
+  model:
+    description: "GPT model to use (e.g., gpt-4, gpt-4o)"
+    required: false
+    default: "gpt-4"
+
+runs:
+  using: "node16"
+  main: "dist/index.js"

@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "allowJs": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "isolatedModules": true,
+        "jsx": "react",
+        "lib": ["ES2017"],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noEmit": false,
+        "strict": true,
+        "target": "ES2017",
+        "outDir": "./dist",
+        "rootDirs": ["src"],
+        "skipLibCheck": true,
+        "strictNullChecks": true,
+        "typeRoots": ["node_modules/@types"],
+        "noImplicitAny": false,
+        "resolveJsonModule": true,
+        "declaration": true,
+        "paths": {
+            
+        }
+    }
+}

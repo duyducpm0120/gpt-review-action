@@ -1,0 +1,225 @@
+diff --git a/src/app.js b/src/app.js
+index 4ae54fd..ba22e2d 100644
+--- a/src/app.js
++++ b/src/app.js
+@@ -1,6 +1,7 @@
+ import express from 'express';
+ import dotenv from 'dotenv';
+ import { connectDB } from './config/db.js';
++import morgan from 'morgan';
+
+ dotenv.config();
+
+@@ -10,6 +11,7 @@ const app = express();
+
+ // Connect to database
+ connectDB();
++app.use(morgan('dev'));
+
+ // Middleware
+ app.use(express.json());
+diff --git a/src/config/db.js b/src/config/db.js
+index 75a647c..ea52b62 100644
+--- a/src/config/db.js
++++ b/src/config/db.js
+@@ -1,10 +1,15 @@
+ import mongoose from 'mongoose';
+
+ const connectDB = async () => {
++  try {
++    console.log('Connecting to MongoDB...');
+     await mongoose.connect(process.env.MONGO_URI, {
+       useNewUrlParser: true,
+       useUnifiedTopology: true,
+       useFindAndModify: false,
+       useCreateIndex: true,
+     });
++    console.log('MongoDB Connected');
++  } catch (error) {
++    console.error(`Error: ${error.message}`);
++    process.exit(1);
+   }
+ };
+
+ export { connectDB };
+diff --git a/src/models/User.js b/src/models/User.js
+index 232aae3..9f72c2c 100644
+--- a/src/models/User.js
++++ b/src/models/User.js
+@@ -1,14 +1,18 @@
+ import mongoose from 'mongoose';
+
+ const userSchema = mongoose.Schema(
+   {
+-    name: {
+-      type: String,
+-      required: true,
+-    },
+-    email: {
+-      type: String,
+-      required: true,
+-      unique: true,
++    username: {
++      type: String,
++      required: true,
++      unique: true,
+     },
++    password: {
++      type: String,
++      required: true,
++    },
++    email: {
++      type: String,
++      required: true,
++      unique: true,
++    },
+     isAdmin: {
+       type: Boolean,
+       required: true,
+@@ -20,9 +24,11 @@ const userSchema = mongoose.Schema(
+     },
+   },
+   {
+-    timestamps: true,
++    timestamps: {
++      createdAt: 'created_at',
++      updatedAt: 'updated_at',
++    },
+   }
+ );
+
+-const User = mongoose.model('User', userSchema);
++const User = mongoose.model('User', userSchema, 'users');
+
+ export default User;
+diff --git a/src/routes/userRoutes.js b/src/routes/userRoutes.js
+index 1c947c4..4b05a12 100644
+--- a/src/routes/userRoutes.js
++++ b/src/routes/userRoutes.js
+@@ -1,9 +1,12 @@
+ import express from 'express';
+ import {
+-  authUser,
+-  registerUser,
+-  getUserProfile,
+-  updateUserProfile,
++  authenticateUser,
++  createUser,
++  getUserById,
++  updateUser,
++  deleteUser,
+ } from '../controllers/userController.js';
+ import { protect } from '../middleware/authMiddleware.js';
+ 
+ const router = express.Router();
+ 
+-router.route('/').post(registerUser);
+-router.route('/login').post(authUser);
++router.route('/').post(createUser);
++router.route('/login').post(authenticateUser);
++router.route('/:id').get(protect, getUserById).put(protect, updateUser).delete(protect, deleteUser);
+
+diff --git a/src/controllers/userController.js b/src/controllers/userController.js
+index e8a3b0d..2d631f7 100644
+--- a/src/controllers/userController.js
++++ b/src/controllers/userController.js
+@@ -1,20 +1,33 @@
+ import asyncHandler from 'express-async-handler';
+ import User from '../models/User.js';
+
+-// @desc    Auth user & get token
+-// @route   POST /api/users/login
+-// @access  Public
+-export const authUser = asyncHandler(async (req, res) => {
++// @desc    Authenticate user & return JWT
++// @route   POST /api/users/login
++// @access  Public
++export const authenticateUser = asyncHandler(async (req, res) => {
+   const { email, password } = req.body;
+
+   const user = await User.findOne({ email });
+
+   if (user && (await user.matchPassword(password))) {
+     res.json({
+       _id: user._id,
+-      name: user.name,
++      username: user.username,
+       email: user.email,
+       isAdmin: user.isAdmin,
+-      token: generateToken(user._id),
++      token: user.generateAuthToken(),
+     });
+   } else {
+     res.status(401);
+     throw new Error('Invalid email or password');
+   }
+ });
+ 
+-// @desc    Register a new user
+-// @route   POST /api/users
+-// @access  Public
+-export const registerUser = asyncHandler(async (req, res) => {
++// @desc    Create a new user
++// @route   POST /api/users
++// @access  Public
++export const createUser = asyncHandler(async (req, res) => {
+   const { username, email, password } = req.body;
+ 
+   const userExists = await User.findOne({ email });
+ 
+   if (userExists) {
+     res.status(400);
+     throw new Error('User already exists');
+   }
+ 
+-  const user = await User.create({
+-    name,
++  const user = new User({
++    username,
+     email,
+     password,
+   });
+ 
+-  if (user) {
+-    res.status(201).json({
+-      _id: user._id,
+-      name: user.name,
+-      email: user.email,
+-      isAdmin: user.isAdmin,
+-      token: generateToken(user._id),
+-    });
++  await user.save();
++
++  res.status(201).json({
++    _id: user._id,
++    username: user.username,
++    email: user.email,
++    isAdmin: user.isAdmin,
++    token: user.generateAuthToken(),
+   });
+ });
+ 
+diff --git a/package.json b/package.json
+index c89b674..1abfe5c 100644
+--- a/package.json
++++ b/package.json
+@@ -1,7 +1,9 @@
+ {
+   "name": "nodejs-app",
+   "version": "1.0.0",
+   "description": "A simple Node.js app",
++  "scripts": {
++    "start": "node src/app.js"
++  },
+   "main": "src/app.js",
+   "type": "module",
+   "dependencies": {
+     "express": "^4.17.1",
+     "dotenv": "^8.2.0",
++    "morgan": "^1.10.0",
+     "mongoose": "^5.10.9"
+   },
+   "devDependencies": {
+     "nodemon": "^2.0.4"
+   }
+ }
