@@ -1,8 +1,8 @@
-import axios from 'axios';
-import { GitHub } from '@actions/github/lib/utils';
-import * as github from '@actions/github';
-import * as core from '@actions/core';
-import { isLocalTesting } from './localConfig';
+import axios from "axios";
+import { GitHub } from "@actions/github/lib/utils";
+import * as github from "@actions/github";
+import * as core from "@actions/core";
+import { isLocalTesting } from "../config";
 
 export const postFileReview = async (
     fileDiff: { fileName: string; content: string },
@@ -12,23 +12,21 @@ export const postFileReview = async (
     model: string
 ) => {
     const { fileName, content } = fileDiff;
-    console.log(`Reviewing file ${fileName}`);
-    console.log(`Content: ${content}`);
     try {
         const response = await axios.post(
-            'https://api.openai.com/v1/chat/completions',
+            "https://api.openai.com/v1/chat/completions",
             {
                 model: model,
                 messages: [
-                    { role: 'system', content: prompt },
-                    { role: 'user', content }
-                ]
+                    { role: "system", content: prompt },
+                    { role: "user", content: String(content) },
+                ],
             },
             {
                 headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                }
+                    Authorization: `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                },
             }
         );
 
@@ -63,7 +61,9 @@ export const postFileReview = async (
             pull_number: pullRequestNumber,
         });
 
-        const matchingFile = pullRequestFiles.data.find(file => file.filename.endsWith(fileName));
+        const matchingFile = pullRequestFiles.data.find((file) =>
+            file.filename.endsWith(fileName)
+        );
 
         if (matchingFile) {
             await octokit.rest.pulls.createReviewComment({
@@ -71,15 +71,15 @@ export const postFileReview = async (
                 repo: repoName,
                 pull_number: pullRequestNumber,
                 body: review,
-                commit_id: commitId,  // Use the latest commit ID
+                commit_id: commitId, // Use the latest commit ID
                 path: matchingFile.filename,
-                position: 1,  // Adjust the position according to your logic
+                position: 1, // Adjust the position according to your logic
             });
         } else {
             core.warning(`File ${fileName} not found in the pull request.`);
         }
-    }
-    catch (error) {
+    } catch (error) {
         console.log("Error in postFileReview: ", error);
+        throw error;
     }
 };

@@ -23,6 +23,8 @@
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test-locally": "yarn build && node dist/index.js"
+    "set-local-testing-on": "node toggleLocalTesting.js on",
+    "set-local-testing-off": "node toggleLocalTesting.js off",
+    "test-locally": "yarn set-local-testing-on && yarn build && node dist/index.js && yarn set-local-testing-off"
   }
 }
