@@ -38,7 +38,9 @@ export const processInputData = async () => {
     const data = isLocalTesting ? getTestInputData() : getInputData();
     const { diffFilePath, openaiApiKey, githubToken, prompt, model } = data;
     const diffContent = fs.readFileSync(diffFilePath, "utf-8");
+    console.log('DiffContent: /n', diffContent);
     const fileDiffs = splitDiffByFile(diffContent);
+    console.log('FileDiffs: /n', fileDiffs);
     const octokit = github.getOctokit(githubToken);
 
     for (const fileDiff of fileDiffs) {

@@ -61,9 +61,13 @@ export const postFileReview = async (
             pull_number: pullRequestNumber,
         });
 
+        console.log('PullRequestFiles: /n', pullRequestFiles);
+
         const matchingFile = pullRequestFiles.data.find((file) =>
             file.filename.endsWith(fileName)
         );
+        
+        console.log('MatchingFile: /n', matchingFile);
 
         if (matchingFile) {
             await octokit.rest.pulls.createReviewComment({
