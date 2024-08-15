@@ -4,6 +4,15 @@ import * as github from "@actions/github";
 import * as core from "@actions/core";
 import { isLocalTesting } from "../config";
 
+export const shouldSkipFileReview = (fileName: string): boolean => {
+    return (
+        fileName.endsWith(".json") ||
+        fileName === "package-lock.json" ||
+        fileName === "yarn.lock"
+    );
+};
+
+
 export const postFileReview = async (
     fileDiff: { fileName: string; content: string },
     apiKey: string,
@@ -12,6 +21,13 @@ export const postFileReview = async (
     model: string
 ) => {
     const { fileName, content } = fileDiff;
+    
+    // Use the helper function to determine if the file should be skipped
+    if (shouldSkipFileReview(fileName)) {
+        console.log(`Skipping review for file ${fileName}`);
+        return;
+    }
+
     try {
         const response = await axios.post(
             "https://api.openai.com/v1/chat/completions",
