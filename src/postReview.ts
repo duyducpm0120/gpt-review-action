@@ -21,7 +21,7 @@ export const postFileReview = async (
     model: string
 ) => {
     const { fileName, content } = fileDiff;
-    
+
     // Use the helper function to determine if the file should be skipped
     if (shouldSkipFileReview(fileName)) {
         console.log(`Skipping review for file ${fileName}`);
@@ -77,7 +77,7 @@ export const postFileReview = async (
             pull_number: pullRequestNumber,
         });
 
-        //console.log('PullRequestFiles: /n', pullRequestFiles);
+        console.log('PullRequestFiles: /n', pullRequestFiles);
 
         const matchingFile = pullRequestFiles.data.find((file) =>
             file.filename.endsWith(fileName)
