@@ -61,13 +61,13 @@ export const postFileReview = async (
             pull_number: pullRequestNumber,
         });
 
-        console.log('PullRequestFiles: /n', pullRequestFiles);
+        //console.log('PullRequestFiles: /n', pullRequestFiles);
 
         const matchingFile = pullRequestFiles.data.find((file) =>
             file.filename.endsWith(fileName)
         );
         
-        console.log('MatchingFile: /n', matchingFile);
+        //console.log('MatchingFile: /n', matchingFile);
 
         if (matchingFile) {
             await octokit.rest.pulls.createReviewComment({
@@ -83,7 +83,7 @@ export const postFileReview = async (
             core.warning(`File ${fileName} not found in the pull request.`);
         }
     } catch (error) {
-        console.log("Error in postFileReview: ", error);
+        //console.log("Error in postFileReview: ", error);
         throw error;
     }
 };
