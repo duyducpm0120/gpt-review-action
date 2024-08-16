@@ -4,6 +4,7 @@ import { splitDiffByFile } from "./splitDiff";
 import { postFileReview } from "./postReview";
 import * as fs from "fs";
 import { isLocalTesting } from "../config";
+import { AvailableModels } from "./const";
 
 export type IInputData = {
   diffFilePath: string;
@@ -18,7 +19,10 @@ const getInputData = (): IInputData => {
   const openaiApiKey = core.getInput("openai-api-key");
   const githubToken = core.getInput("github-token");
   const prompt = core.getInput("prompt");
-  const model = core.getInput("model");
+  const inputModel = core.getInput("model");
+  const model = AvailableModels.includes(inputModel)
+    ? inputModel
+    : AvailableModels[0]; // 'gpt-4o' is the default model
 
   return { diffFilePath, openaiApiKey, githubToken, prompt, model };
 };

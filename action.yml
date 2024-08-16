@@ -20,7 +20,7 @@ inputs:
   model:
     description: "GPT model to use (e.g., gpt-4, gpt-4o)"
     required: false
-    default: "gpt-4"
+    default: "gpt-4o"
 
 runs:
   using: "node16"
