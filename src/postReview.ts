@@ -101,13 +101,13 @@ export const postFileReview = async (
         body: review,
         commit_id: commitId, // Use the latest commit ID
         path: matchingFile.filename,
-        position: 1, // Adjust the position according to your logic
+        line: matchingFile.changes,
       });
     } else {
       core.warning(`File ${fileName} not found in the pull request.`);
     }
   } catch (error) {
-    //console.log("Error in postFileReview: ", error);
+    console.log("Error in postFileReview: ", error);
     throw error;
   }
 };
