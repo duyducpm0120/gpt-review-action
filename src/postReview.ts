@@ -14,7 +14,9 @@ export const postFileReview = async (
   apiKey: string,
   octokit: InstanceType<typeof GitHub>,
   prompt: string,
-  model: string
+  model: string,
+  commitId: string,
+  pullRequestFiles: { filename: string }[]
 ) => {
   const { fileName, content } = fileDiff;
 
@@ -57,46 +59,9 @@ export const postFileReview = async (
     const repoOwner = context.repo.owner;
     const repoName = context.repo.repo;
 
-    // Retrieve the list of commits to get the latest commit ID
-    const { data: commits } = await octokit.rest.pulls.listCommits({
-      owner: repoOwner,
-      repo: repoName,
-      pull_number: pullRequestNumber,
-    });
-
-    const latestCommit = commits[commits.length - 1];
-    const commitId = latestCommit.sha;
-
-    const pullRequestFiles = await octokit.rest.pulls.listFiles({
-      owner: repoOwner,
-      repo: repoName,
-      pull_number: pullRequestNumber,
-    });
-
-    console.log(
-      "PullRequestFile names before removed all file paths matching excluded patterns: /n",
-      pullRequestFiles.data.map((file) => file.filename) // Print the file names
-    );
-
-    // Remove all the file paths that match the excluded patterns
-    pullRequestFiles.data.forEach((file) => {
-      if (shouldSkipFileReview(file.filename)) {
-        pullRequestFiles.data = pullRequestFiles.data.filter(
-          (f) => f.filename !== file.filename
-        );
-      }
-    });
-
-    console.log(
-      "PullRequestFile names after removed all file paths matching excluded patterns: /n",
-      pullRequestFiles.data.map((file) => file.filename) // Print the file names
-    );
-
-    const matchingFile = pullRequestFiles.data.find((file) =>
+    const matchingFile = pullRequestFiles.find((file) =>
       file.filename.endsWith(fileName)
     );
-
-    //console.log('MatchingFile: /n', matchingFile);
 
     if (matchingFile) {
       await octokit.rest.pulls.createReviewComment({

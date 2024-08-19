@@ -5,6 +5,11 @@ import { postFileReview } from "./postReview";
 import * as fs from "fs";
 import { isLocalTesting } from "../config";
 import { AvailableModels } from "./const";
+import {
+  filterPullRequestFiles,
+  getAllPullRequestFiles,
+  getLatestCommitId,
+} from "./utils";
 
 export type IInputData = {
   diffFilePath: string;
@@ -48,8 +53,20 @@ export const processInputData = async () => {
     //console.log('FileDiffs: /n', fileDiffs);
     const octokit = github.getOctokit(githubToken);
 
+    const commitId = await getLatestCommitId(octokit);
+    const pullRequestFiles = await getAllPullRequestFiles(octokit);
+    const filteredPullRequestFiles = filterPullRequestFiles(pullRequestFiles);
+
     for (const fileDiff of fileDiffs) {
-      await postFileReview(fileDiff, openaiApiKey, octokit, prompt, model);
+      await postFileReview(
+        fileDiff,
+        openaiApiKey,
+        octokit,
+        prompt,
+        model,
+        commitId,
+        filteredPullRequestFiles
+      );
     }
   } catch (error: any) {
     core.setFailed(error.message);
