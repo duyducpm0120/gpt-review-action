@@ -6,7 +6,7 @@ import * as fs from "fs";
 import { isLocalTesting } from "../config";
 import { AvailableModels } from "./const";
 import {
-  filterPullRequestFiles,
+  filterPullRequestFilesData,
   getAllPullRequestFiles,
   getLatestCommitId,
 } from "./utils";
@@ -68,7 +68,8 @@ export const processInputData = async () => {
 
     const commitId = await getLatestCommitId(octokit);
     const pullRequestFiles = await getAllPullRequestFiles(octokit);
-    const filteredPullRequestFiles = filterPullRequestFiles(pullRequestFiles);
+    const filteredPullRequestFilesData =
+      filterPullRequestFilesData(pullRequestFiles);
 
     for (const fileDiff of fileDiffs) {
       await postFileReview(
@@ -78,7 +79,7 @@ export const processInputData = async () => {
         prompt,
         model,
         commitId,
-        filteredPullRequestFiles
+        filteredPullRequestFilesData
       );
     }
   } catch (error: any) {

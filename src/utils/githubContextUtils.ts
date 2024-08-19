@@ -1,9 +1,10 @@
 import { GitHub } from "@actions/github/lib/utils";
 import * as github from "@actions/github";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
 export const getAllPullRequestFiles = async (
   octokit: InstanceType<typeof GitHub>
-) => {
+): Promise<RestEndpointMethodTypes["pulls"]["listFiles"]["response"]> => {
   const context = github.context;
 
   const pullRequestNumber = context.issue.number;
@@ -15,7 +16,7 @@ export const getAllPullRequestFiles = async (
     repo: repoName,
     pull_number: pullRequestNumber,
   });
-  return pullRequestFiles.data;
+  return pullRequestFiles;
 };
 
 export const getAllPullRequestCommits = async (

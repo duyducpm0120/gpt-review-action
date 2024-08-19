@@ -4,6 +4,7 @@ import * as github from "@actions/github";
 import * as core from "@actions/core";
 import { isLocalTesting } from "../config";
 import { OpenAIUrls } from "./const";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
 export const postFileReview = async (
   fileDiff: { fileName: string; content: string },
@@ -12,7 +13,7 @@ export const postFileReview = async (
   prompt: string,
   model: string,
   commitId: string,
-  pullRequestFiles: { filename: string }[]
+  pullRequestFiles: RestEndpointMethodTypes["pulls"]["listFiles"]["response"]["data"]
 ) => {
   const { fileName, content } = fileDiff;
   try {
@@ -51,7 +52,6 @@ export const postFileReview = async (
     const matchingFile = pullRequestFiles.find((file) =>
       file.filename.endsWith(fileName)
     );
-
     if (matchingFile) {
       console.log(
         `Posting review for file ${fileName} with content: ${review}`

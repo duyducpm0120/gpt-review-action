@@ -2,14 +2,14 @@ import { ExcludedPatterns } from "../const";
 import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 import { shouldSkipFileReview } from "./skipFile";
 
-export const filterPullRequestFiles = (
-  pullRequestFiles: RestEndpointMethodTypes["pulls"]["listFiles"]["response"]["data"]
+export const filterPullRequestFilesData = (
+  pullRequestFiles: RestEndpointMethodTypes["pulls"]["listFiles"]["response"]
 ) => {
   console.log(
     "PullRequestFile names before removed all file paths matching excluded patterns: /n",
-    pullRequestFiles.map((file) => file.filename) // Print the file names
+    pullRequestFiles.data.map((file) => file.filename) // Print the file names
   );
-  const filteredFiles = pullRequestFiles.filter((file) => {
+  const filteredFiles = pullRequestFiles.data.filter((file) => {
     const isSkipped = shouldSkipFileReview(file.filename);
     if (isSkipped) {
       console.log(`Skipping file ${file.filename}`);
