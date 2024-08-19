@@ -1,1 +1,1 @@
-export let isLocalTesting = false;
+export let isLocalTesting = true;

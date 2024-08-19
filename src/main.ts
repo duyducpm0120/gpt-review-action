@@ -53,10 +53,6 @@ export const processInputData = async () => {
     //console.log('FileDiffs: /n', fileDiffs);
     const octokit = github.getOctokit(githubToken);
 
-    const commitId = await getLatestCommitId(octokit);
-    const pullRequestFiles = await getAllPullRequestFiles(octokit);
-    const filteredPullRequestFiles = filterPullRequestFiles(pullRequestFiles);
-
     if (isLocalTesting) {
       await postFileReview(
         fileDiffs[0],
@@ -69,6 +65,10 @@ export const processInputData = async () => {
       );
       return;
     }
+
+    const commitId = await getLatestCommitId(octokit);
+    const pullRequestFiles = await getAllPullRequestFiles(octokit);
+    const filteredPullRequestFiles = filterPullRequestFiles(pullRequestFiles);
 
     for (const fileDiff of fileDiffs) {
       await postFileReview(
