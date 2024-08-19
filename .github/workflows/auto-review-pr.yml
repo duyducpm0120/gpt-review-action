@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v4.1.1
         with:
           repository: duyducpm0120/gpt-review-action
-          ref: 0.0.4-alpha.3
+          ref: 0.0.4-alpha.9
           token: ${{ secrets.AUTO_REVIEW_CODE_REPO_PAT_TOKEN }}
           path: gpt-review-action # This sets the directory name for the checkout
 
