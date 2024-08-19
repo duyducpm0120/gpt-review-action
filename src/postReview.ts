@@ -83,8 +83,8 @@ export const postFileReview = async (
     });
 
     console.log(
-      "PullRequestFiles after removed all file paths matching excluded patterns: /n",
-      pullRequestFiles
+      "PullRequestFile names after removed all file paths matching excluded patterns: /n",
+      pullRequestFiles.data.map((file) => file.filename) // Print the file names
     );
 
     const matchingFile = pullRequestFiles.data.find((file) =>
