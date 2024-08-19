@@ -64,6 +64,9 @@ export const postFileReview = async (
     );
 
     if (matchingFile) {
+      console.log(
+        `Posting review for file ${fileName} with content: ${review}`
+      );
       await octokit.rest.pulls.createReviewComment({
         owner: repoOwner,
         repo: repoName,
