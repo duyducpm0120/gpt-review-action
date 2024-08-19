@@ -3,11 +3,7 @@ import { GitHub } from "@actions/github/lib/utils";
 import * as github from "@actions/github";
 import * as core from "@actions/core";
 import { isLocalTesting } from "../config";
-import { ExcludedPatterns, OpenAIUrls } from "./const";
-
-export const shouldSkipFileReview = (fileName: string): boolean => {
-  return ExcludedPatterns.some((pattern) => fileName.includes(pattern));
-};
+import { OpenAIUrls } from "./const";
 
 export const postFileReview = async (
   fileDiff: { fileName: string; content: string },
@@ -19,13 +15,6 @@ export const postFileReview = async (
   pullRequestFiles: { filename: string }[]
 ) => {
   const { fileName, content } = fileDiff;
-
-  // Use the helper function to determine if the file should be skipped
-  if (shouldSkipFileReview(fileName)) {
-    console.log(`Skipping review for file ${fileName}`);
-    return;
-  }
-
   try {
     const response = await axios.post(
       OpenAIUrls.completion,
