@@ -106,7 +106,7 @@ export const postFileReview = async (
         body: review,
         commit_id: commitId, // Use the latest commit ID
         path: matchingFile.filename,
-        line: matchingFile.changes,
+        subject_type: "file",
       });
     } else {
       core.warning(`File ${fileName} not found in the pull request.`);
