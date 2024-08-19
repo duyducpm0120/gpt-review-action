@@ -57,6 +57,19 @@ export const processInputData = async () => {
     const pullRequestFiles = await getAllPullRequestFiles(octokit);
     const filteredPullRequestFiles = filterPullRequestFiles(pullRequestFiles);
 
+    if (isLocalTesting) {
+      await postFileReview(
+        fileDiffs[0],
+        openaiApiKey,
+        octokit,
+        prompt,
+        model,
+        "",
+        []
+      );
+      return;
+    }
+
     for (const fileDiff of fileDiffs) {
       await postFileReview(
         fileDiff,
