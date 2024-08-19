@@ -28,6 +28,8 @@ index dcf2a3b..3b6f7ac 100644
 +import React, { useState, useEffect } from 'react';
 +import { View, Text, StyleSheet, Button } from 'react-native';
 +import axios from 'axios';
++import axios from 'axios';
++import axios from 'axios';
 
  const MyComponent = () => {
 -  return (
