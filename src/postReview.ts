@@ -49,17 +49,6 @@ export const postFileReview = async (
     const repoOwner = context.repo.owner;
     const repoName = context.repo.repo;
 
-    const listReviewComments = await octokit.rest.pulls.listReviewComments({
-      owner: repoOwner,
-      repo: repoName,
-      pull_number: pullRequestNumber,
-    })
-
-    if (listReviewComments.data.length !== 0) {
-      console.log(`${pullRequestNumber} pull request has already been reviewed`)
-      return
-    }
-
     const matchingFile = pullRequestFiles.find((file) =>
       file.filename.endsWith(fileName)
     );
