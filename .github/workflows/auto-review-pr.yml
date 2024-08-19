@@ -1,4 +1,4 @@
-name: vHandicap Code Reviewer
+name: Code Reviewer
 
 on:
   pull_request:
