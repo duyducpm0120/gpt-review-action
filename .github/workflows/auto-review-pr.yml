@@ -1,0 +1,57 @@
+name: vHandicap Code Reviewer
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  code_review:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the target repository (the one where the workflow is defined)
+      - uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0
+
+      # Step 2: Generate Diff
+      - uses: GrantBirki/git-diff-action@v2.4.0
+        id: git-diff
+        with:
+          raw_diff_file_output: diff.txt
+          file_output_only: "true" # Suppress output in the console
+          diff_filter: "ACMR" # Include only added, copied, modified, and renamed files
+          diff_exclude: "yarn.lock,package-lock.json" # Exclude these files from the diff
+
+      # Step 3: Checkout the private action repository using the PAT
+      - name: Checkout Private Action
+        uses: actions/checkout@v4.1.1
+        with:
+          repository: duyducpm0120/gpt-review-action
+          ref: 0.0.4-alpha.3
+          token: ${{ secrets.AUTO_REVIEW_CODE_REPO_PAT_TOKEN }}
+          path: gpt-review-action # This sets the directory name for the checkout
+
+      # Step 4: Install dependencies in the private action repository
+      - name: Install Dependencies
+        run: yarn install
+        working-directory: gpt-review-action
+
+      # Step 5: Build the project in the private action repository
+      - name: Build the Project
+        run: yarn build
+        working-directory: gpt-review-action
+
+      # Step 6: Run the private action to review the code
+      - name: Run GPT-4 Code Review
+        uses: ./gpt-review-action # Reference the action using the relative path after checkout
+        with:
+          diff-file-path: diff.txt
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          github-token: ${{ secrets.AUTO_REVIEW_CODE_TOKEN }}
+          prompt: ${{ vars.CODE_REVIEW_PROMPT }} # Retrieve the prompt from the GitHub variable
+          model: "gpt-4"
