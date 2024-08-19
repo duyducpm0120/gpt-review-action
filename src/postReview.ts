@@ -73,6 +73,11 @@ export const postFileReview = async (
       pull_number: pullRequestNumber,
     });
 
+    console.log(
+      "PullRequestFile names before removed all file paths matching excluded patterns: /n",
+      pullRequestFiles.data.map((file) => file.filename) // Print the file names
+    );
+
     // Remove all the file paths that match the excluded patterns
     pullRequestFiles.data.forEach((file) => {
       if (shouldSkipFileReview(file.filename)) {
