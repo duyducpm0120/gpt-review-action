@@ -24,8 +24,6 @@ jobs:
         with:
           raw_diff_file_output: diff.txt
           file_output_only: "true" # Suppress output in the console
-          diff_filter: "ACMR" # Include only added, copied, modified, and renamed files
-          diff_exclude: "yarn.lock,package-lock.json" # Exclude these files from the diff
 
       # Step 3: Checkout the private action repository using the PAT
       - name: Checkout Private Action
